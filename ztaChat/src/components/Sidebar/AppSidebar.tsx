@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useLocation, Link } from "react-router";
 
-import Profile from "./Profile";
+import Profile from "./SearchUser";
 import {
   Sidebar,
   SidebarContent,

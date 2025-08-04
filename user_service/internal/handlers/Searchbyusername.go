@@ -9,9 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type userProfile struct {
+	ID           uint   `json:"ID"`
+	ProfileImage string `json:"ProfileImage"`
+	Username     string `json:"Username"`
+}
 type SearchbyusernameResponse struct {
 	utils.Response
-	Data []models.Profile `json:"data"`
+	Users []userProfile `json:"users"`
 }
 
 func Searchbyusername(c *gin.Context) {
@@ -34,10 +39,19 @@ func Searchbyusername(c *gin.Context) {
 		c.JSON(404, utils.Response{
 			Code:    404,
 			Success: false,
-			Message: "Not foud",
+			Message: "Not found",
 			Error:   err.Error(),
 		})
 		return
+	}
+
+	var userProfiles []userProfile
+	for _, user := range users {
+		userProfiles = append(userProfiles, userProfile{
+			ID:           user.ID,
+			ProfileImage: user.ProfileImage,
+			Username:     user.Username,
+		})
 	}
 
 	tx.Commit()
@@ -48,6 +62,6 @@ func Searchbyusername(c *gin.Context) {
 			Message: "Users found",
 			Error:   nil,
 		},
-		Data: users,
+		Users: userProfiles,
 	})
 }
