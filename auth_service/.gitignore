@@ -1,0 +1,6 @@
+.env
+*.log
+auth_service
+dist/
+.DS_Store
+tmp/
