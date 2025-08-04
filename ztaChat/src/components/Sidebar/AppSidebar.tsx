@@ -1,10 +1,9 @@
 import * as React from "react";
 import { useLocation, Link } from "react-router";
-
-import Profile from "./SearchUser";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -15,16 +14,19 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { data } from "./sidebar";
-
-// This is sample data.
+import SearchUser from "./SearchUser";
+import { NavUser } from "./NavUser";
+import useCurrentUser from "@/utils/Hooks/useCurrentUser";
+import { Skeleton } from "../ui/skeleton";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
+  const { userProfile } = useCurrentUser();
 
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        <Profile versions={data.versions} defaultVersion={data.versions[0]} />
+        <SearchUser />
       </SidebarHeader>
       <SidebarContent>
         {data.navMain.map((item) => (
@@ -47,6 +49,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter>
+        {!userProfile ? (
+          <div className="flex items-center gap-2 w-full">
+            <Skeleton className="h-6 w-6 rounded-lg" />
+            <Skeleton className="h-6 w-full" />
+          </div>
+        ) : (
+          <NavUser user={userProfile} />
+        )}
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

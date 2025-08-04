@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"user_service/internal/database"
 	"user_service/internal/models"
 	"user_service/internal/utils"
@@ -21,6 +20,12 @@ type SearchbyusernameResponse struct {
 
 func Searchbyusername(c *gin.Context) {
 	username := c.Query("username")
+	currentUser := c.GetString("currentUser")
+
+	if currentUser == "" {
+		currentUser = c.Query("currentUser")
+	}
+
 	if username == "" {
 		c.JSON(400, utils.Response{
 			Code:    400,
@@ -30,11 +35,13 @@ func Searchbyusername(c *gin.Context) {
 		})
 		return
 	}
-	fmt.Printf("%s", username)
 
 	tx := database.DB.Begin()
 	var users []models.Profile
-	if err := tx.Where("username LIKE ?", username+"%").Find(&users).Error; err != nil {
+
+	query := "username LIKE ? AND username != ? AND username != ''"
+	if err := tx.Where(query, username+"%", currentUser).
+		Find(&users).Error; err != nil {
 		tx.Rollback()
 		c.JSON(404, utils.Response{
 			Code:    404,
@@ -47,11 +54,13 @@ func Searchbyusername(c *gin.Context) {
 
 	var userProfiles []userProfile
 	for _, user := range users {
-		userProfiles = append(userProfiles, userProfile{
-			ID:           user.ID,
-			ProfileImage: user.ProfileImage,
-			Username:     user.Username,
-		})
+		if user.Username != currentUser && user.Username != "" {
+			userProfiles = append(userProfiles, userProfile{
+				ID:           user.ID,
+				ProfileImage: user.ProfileImage,
+				Username:     user.Username,
+			})
+		}
 	}
 
 	tx.Commit()

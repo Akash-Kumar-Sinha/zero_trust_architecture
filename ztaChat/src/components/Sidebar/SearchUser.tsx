@@ -8,7 +8,7 @@ import { UserProfile } from "@/utils/type";
 import ProfileSearch from "./ProfileSearch";
 import { Skeleton } from "../ui/skeleton";
 
-const Profile = () => {
+const SearchUser = () => {
   const [loading, setLoading] = React.useState(false);
   const [usernameInput, setUsernameInput] = React.useState("");
   const [profiles, setProfiles] = React.useState<UserProfile[]>([]);
@@ -19,6 +19,7 @@ const Profile = () => {
       const { data } = await axios.get(`${USER_SERVER_URL}/search_users`, {
         params: {
           username: usernameInput,
+          currentUser: "akashkrsinha5084"
         },
       });
       console.log("Fetched users: ", data.users);
@@ -98,4 +99,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default SearchUser;

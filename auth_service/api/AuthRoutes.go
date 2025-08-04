@@ -13,7 +13,9 @@ func AuthRoutes(router *gin.RouterGroup) *gin.RouterGroup {
 
 	router.POST("/login_account", handlers.Login)
 
-	router.GET("/profile", handlers.Profile)
-	
 	router.GET("/auth_verifications", handlers.Checklogin)
-return router }
+
+	router.GET("/verify_token_claims", handlers.VerifyTokenClaims)
+
+	return router
+}

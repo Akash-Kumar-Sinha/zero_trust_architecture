@@ -26,7 +26,7 @@ export const data: SidebarData = {
   navMain: [
     {
       title: "Chats",
-      url: "",
+      url: "#",
       items: chats.map(chat => ({
         title: chat.name,
         url: `/chat/${chat.id}`, 
