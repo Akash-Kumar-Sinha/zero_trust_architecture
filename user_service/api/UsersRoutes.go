@@ -15,6 +15,7 @@ func UsersRoutes(router *gin.RouterGroup) *gin.RouterGroup {
 	router.GET("/get_friend_requests", handlers.GetFriendRequests)
 	router.PUT("/accept_friend_request", handlers.AcceptFriendRequest)
 	router.GET("/get_friends", handlers.GetFriends)
+	router.GET("/get_conversation", handlers.GetConversation)
 
 	return router
 }

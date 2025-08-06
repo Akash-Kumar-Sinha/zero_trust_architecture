@@ -1,14 +1,14 @@
 import RequestCard from "@/components/FriendRequests/RequestCard";
 import { Button } from "@/components/ui/button";
 import { USER_SERVER_URL } from "@/utils/constant";
-import useCurrentUser from "@/utils/Hooks/useCurrentUser";
+import { useAppSelector } from "@/utils/Hooks/redux";
 import { type FriendRequests } from "@/utils/type";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 const FriendRequests = () => {
   const [loading, setLoading] = useState(false);
-  const { userProfile } = useCurrentUser();
+  const { userProfile } = useAppSelector((state) => state.user);
   const [friendRequests, setFriendRequests] = useState<FriendRequests[]>([]);
   const fetchFriendRequests = async () => {
     setLoading(true);
@@ -62,7 +62,7 @@ const FriendRequests = () => {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="relative">
       <Button onClick={fetchFriendRequests} className="fixed right-4">

@@ -7,14 +7,15 @@ import { USER_SERVER_URL } from "@/utils/constant";
 import { UserProfile } from "@/utils/type";
 import ProfileSearch from "./ProfileSearch";
 import { Skeleton } from "../ui/skeleton";
-import useCurrentUser from "@/utils/Hooks/useCurrentUser";
+import { useAppSelector } from "@/utils/Hooks/redux";
 import { authHeaders } from "@/utils/utils";
+import { useEffect } from "react";
 
 const SearchUser = () => {
   const [loading, setLoading] = React.useState(false);
   const [usernameInput, setUsernameInput] = React.useState("");
   const [profiles, setProfiles] = React.useState<UserProfile[]>([]);
-  const { userProfile } = useCurrentUser();
+  const { userProfile } = useAppSelector((state) => state.user);
 
   const fetchUsersByUsername = async () => {
     setLoading(true);
@@ -53,12 +54,12 @@ const SearchUser = () => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (usernameInput.trim()) {
       const debounceTimer = setTimeout(() => {
         setLoading(true);
         fetchUsersByUsername();
-      }, 300); // 300ms debounce
+      }, 300); 
 
       return () => clearTimeout(debounceTimer);
     } else {

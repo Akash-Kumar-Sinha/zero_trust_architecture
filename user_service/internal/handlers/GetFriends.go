@@ -10,7 +10,7 @@ import (
 
 type getFriendsResponse struct {
 	utils.Response
-	Data []models.Profile `json:"data"`
+	Friends []models.Profile `json:"friends"`
 }
 
 func GetFriends(c *gin.Context) {
@@ -69,7 +69,7 @@ func GetFriends(c *gin.Context) {
 				Message: "No friends found",
 				Error:   nil,
 			},
-			Data: []models.Profile{},
+			Friends: []models.Profile{},
 		})
 		return
 	}
@@ -94,6 +94,6 @@ func GetFriends(c *gin.Context) {
 			Message: "Friends retrieved successfully",
 			Error:   nil,
 		},
-		Data: friends,
+		Friends: friends,
 	})
 }

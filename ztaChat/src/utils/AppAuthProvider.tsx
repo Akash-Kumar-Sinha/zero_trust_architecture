@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { load } from "@tauri-apps/plugin-store";
 import axios from "axios";
 import { AUTH_SERVER_URL } from "./constant";
 import { useNavigate, useLocation } from "react-router";
+import { useAppDispatch } from "./Hooks/redux";
+import { fetchUserProfile } from "@/features/userSlice";
+import { loadStoredData } from "@/features/storeSlice";
 
 type AUTH_STATUS = "LOADING" | "AUTHENTICATED" | "UNAUTHENTICATED";
 
@@ -10,16 +12,18 @@ const AppAuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [authStatus, setAuthStatus] = useState<AUTH_STATUS>("LOADING");
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
 
   const checkAuthentication = async () => {
     try {
       console.log("Checking app-level authentication...");
-      const store = await load("store.json", { autoSave: true });
 
-      const email = await store.get("u_email");
-      const token = await store.get("zta_auth_token");
+      // Load stored data into Redux if not already loaded
+      const storeState = await dispatch(loadStoredData()).unwrap();
+      const email = storeState.userEmail;
+      const token = storeState.authToken;
 
-      console.log(email, token)
+      console.log("Email:", email, "Token exists:", !!token);
 
       if (!email || !token || email === "" || token === "") {
         console.log("No credentials found");
@@ -42,6 +46,10 @@ const AppAuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.success) {
         console.log("User is authenticated");
         setAuthStatus("AUTHENTICATED");
+
+        // Fetch user profile once authenticated
+        console.log("🔄 Dispatching fetchUserProfile...");
+        dispatch(fetchUserProfile());
 
         if (location.pathname === "/auth") {
           console.log("Authenticated user on auth page, redirecting to /home");

@@ -10,9 +10,10 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useNavigate } from "react-router";
-import { load } from "@tauri-apps/plugin-store";
 import axios from "axios";
 import { AUTH_SERVER_URL } from "@/utils/constant";
+import { useAppDispatch, useAppSelector } from "@/utils/Hooks/redux";
+import { saveOtpToken, saveAuthCredentials } from "@/features/storeSlice";
 
 type LOGIN_STAGE = "EMAIL" | "OTP" | "PASSWORD";
 
@@ -30,6 +31,8 @@ const passwordSchema = z.object({
 
 const Auth = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { tokens } = useAppSelector((state) => state.store);
 
   const [loginStage, setLoginStage] = useState<LOGIN_STAGE>("EMAIL");
   const [email, setEmail] = useState<string>("");
@@ -84,7 +87,7 @@ const Auth = () => {
   };
   const handleOtpVerification = async () => {
     try {
-      setLoading(false);
+      setLoading(true);
       console.log("handleverification");
       const validatedData = otpSchema.parse({ otp });
       console.log("Valid OTP:", validatedData.otp);
@@ -94,9 +97,11 @@ const Auth = () => {
         otp: otpValue,
       });
 
-      const store = await load("store.json", { autoSave: true });
       console.log("OTP Verification returned token:", data);
-      await store.set("otp_token", data.token);
+
+      // Save OTP token using Redux
+      await dispatch(saveOtpToken(data.token)).unwrap();
+
       if (data.success) {
         setLoginStage("PASSWORD");
       }
@@ -123,9 +128,17 @@ const Auth = () => {
       const validatedData = passwordSchema.parse({ password });
       console.log("Valid password:", validatedData.password);
 
-      const store = await load("store.json", { autoSave: true });
+      // Get OTP token from Redux store
+      const otpToken = tokens.otpToken;
 
-      const val = await store.get("otp_token");
+      if (!otpToken) {
+        setErrors((e) => ({
+          ...e,
+          general: "OTP token not found. Please verify OTP again.",
+        }));
+        return;
+      }
+
       const { data } = await axios.post(
         `${AUTH_SERVER_URL}/login_account`,
         {
@@ -135,16 +148,20 @@ const Auth = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${val}`,
+            Authorization: `Bearer ${otpToken}`,
           },
         }
       );
-      if (data.success) {
-        await store.delete("otp_token");
 
-        await store.set("zta_auth_token", data.token);
-        await store.set("u_email", email);
-        await store.set("zta_private_key", data.private_key);
+      if (data.success) {
+        // Save auth credentials using Redux
+        await dispatch(
+          saveAuthCredentials({
+            authToken: data.token,
+            privateKey: data.private_key,
+            userEmail: email,
+          })
+        ).unwrap();
 
         navigate("/home");
       } else {

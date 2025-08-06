@@ -31,3 +31,12 @@ export type FriendRequests = GormModel & {
 
   Status: RequestStatus;
 };
+
+export type Conversation = GormModel & {
+  PublicKey: string;
+  PrivateKey: string;
+  Profile1: Profile;
+  Profile1ID: number;
+  Profile2: Profile;
+  Profile2ID: number;
+};

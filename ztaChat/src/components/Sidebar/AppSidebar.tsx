@@ -16,17 +16,38 @@ import {
 import { getSidebarData } from "./sidebar";
 import SearchUser from "./SearchUser";
 import { NavUser } from "./NavUser";
-import useCurrentUser from "@/utils/Hooks/useCurrentUser";
 import { Skeleton } from "../ui/skeleton";
-import useFriends from "@/utils/Hooks/useFriends";
+import { useAppDispatch, useAppSelector } from "@/utils/Hooks/redux";
+import { getConversations } from "@/features/conversationsSlice";
+import { getFriends } from "@/features/friendsSlice";
+import { fetchUserProfile } from "@/features/userSlice";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
-  const { userProfile } = useCurrentUser();
-  const {friends} = useFriends();
+  const { userProfile, loading } = useAppSelector((state) => state.user);
+  const { friends } = useAppSelector((state) => state.friends);
+  const dispatch = useAppDispatch();
+
+  React.useEffect(() => {
+    if (userProfile?.ID) {
+      console.log("🔄 Loading friends for user:", userProfile.Username);
+      dispatch(getFriends(userProfile.ID));
+    } else {
+      dispatch(fetchUserProfile());
+    }
+  }, [userProfile, dispatch]);
 
   const data = getSidebarData(friends);
-  
+  if (!userProfile || loading) {
+    return (
+      <Sidebar {...props}>
+        <SidebarHeader>
+          <SearchUser />
+        </SidebarHeader>
+      </Sidebar>
+    );
+  }
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -34,17 +55,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         {data.navMain.map((item) => (
-          <SidebarGroup key={item.title}>
-            <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+          <SidebarGroup key={item.username}>
+            <SidebarGroupLabel>{item.username}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {item.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
+                  <SidebarMenuItem key={item.username}>
                     <SidebarMenuButton
                       asChild
                       isActive={location.pathname === item.url}
+                      onClick={() => {
+                        dispatch(
+                          getConversations({
+                            userOneUsername: userProfile?.Username,
+                            userTwoUsername: item.username,
+                          })
+                        );
+                      }}
                     >
-                      <Link to={item.url}>{item.title}</Link>
+                      <Link to={item.url}>{item.username}</Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}

@@ -6,7 +6,6 @@ import {
   Sparkles,
   UserPlus2,
 } from "lucide-react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -24,12 +23,18 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { type Profile } from "@/utils/type";
-import useCurrentUser from "@/utils/Hooks/useCurrentUser";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import { useAppDispatch } from "@/utils/Hooks/redux";
+import { logoutUser } from "@/features/userSlice";
 
 export const NavUser = ({ user }: { user: Profile }) => {
   const { isMobile } = useSidebar();
-  const { handleLogout } = useCurrentUser();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser(navigate));
+  };
 
   return (
     <SidebarMenu>
@@ -83,7 +88,10 @@ export const NavUser = ({ user }: { user: Profile }) => {
                 Account
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <NavLink to="/friend_requests" className="flex items-center gap-2">
+                <NavLink
+                  to="/friend_requests"
+                  className="flex items-center gap-2"
+                >
                   <UserPlus2 />
                   FriendRequests
                 </NavLink>
