@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"user_service/internal/database"
@@ -13,28 +12,63 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type getCurrentUserResponse struct {
-	utils.Response
-	Profile models.Profile `json:"profile"`
-}
 
-func GetCurrentUser(c *gin.Context) {
+
+func SendFriendRequest(c *gin.Context) {
+	var request utils.CurrentUserProfile
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(400, utils.Response{
+			Code:    400,
+			Success: false,
+			Message: "Invalid information",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	tx := database.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			c.JSON(500, utils.Response{
+				Code:    500,
+				Success: false,
+				Message: "Internal Server Error",
+				Error:   fmt.Sprintf("Panic occured: %v", r),
+			})
+			return
+		}
+	}()
+
+	var receiver models.Profile
+	if err := tx.Where("username = ?", request.Username).First(&receiver).Error; err != nil {
+		tx.Rollback()
+		c.JSON(404, utils.Response{
+			Code:    404,
+			Success: false,
+			Message: "User not found",
+			Error:   err.Error(),
+		})
+		return
+
+	}
 	headers := c.Request.Header
 
 	authHeader := headers.Get("Authorization")
+
 	if authHeader == "" {
 		c.JSON(401, utils.Response{
 			Code:    401,
 			Success: false,
 			Message: "Unauthorized",
-			Error:   "Authorization header is missing",
+			Error:   "Unauthorized user",
 		})
 		return
 	}
 
 	verifyUrl := os.Getenv("VERIFY_TOKEN_CLAIMS")
 	if verifyUrl == "" {
-		log.Fatal("VERIFY_TOKEN_CLAIMS is not set in the environment files")
 		c.JSON(400, utils.Response{
 			Code:    400,
 			Success: false,
@@ -49,13 +83,12 @@ func GetCurrentUser(c *gin.Context) {
 		c.JSON(500, utils.Response{
 			Code:    500,
 			Success: false,
-			Message: "Internal Server Error",
+			Message: "Internal server error",
 			Error:   err.Error(),
 		})
 		return
 	}
 	req.Header.Set("Authorization", authHeader)
-
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -82,19 +115,6 @@ func GetCurrentUser(c *gin.Context) {
 		return
 	}
 
-	tx := database.DB.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-			c.JSON(500, utils.Response{
-				Code:    500,
-				Success: false,
-				Message: "Internal Server Error",
-				Error:   fmt.Sprintf("Panic occurred: %v", r),
-			})
-		}
-	}()
-
 	var profile models.Profile
 	if err := tx.Where("email = ?", verifyResp.User.Email).First(&profile).Error; err != nil {
 		tx.Rollback()
@@ -107,15 +127,29 @@ func GetCurrentUser(c *gin.Context) {
 		return
 	}
 
+	addFriendRequest := models.FriendRequest{
+		RequesterID: profile.ID,
+		ReceiverID:  receiver.ID,
+		Status:      models.Pending,
+	}
+
+	if err := tx.Create(&addFriendRequest).Error; err != nil {
+		tx.Rollback()
+		c.JSON(500, utils.Response{
+			Code:    500,
+			Success: false,
+			Message: "Internal Server Error",
+			Error:   "Faild to send friend request",
+		})
+		return
+	}
+
 	tx.Commit()
 
-	c.JSON(200, getCurrentUserResponse{
-		Response: utils.Response{
-			Code:    200,
-			Success: true,
-			Message: "Current user retrieved successfully",
-			Error:   nil,
-		},
-		Profile: profile,
+	c.JSON(200, utils.Response{
+		Code:    200,
+		Success: true,
+		Message: fmt.Sprintf("Send friend request to %v", receiver.Username),
+		Error:   nil,
 	})
 }

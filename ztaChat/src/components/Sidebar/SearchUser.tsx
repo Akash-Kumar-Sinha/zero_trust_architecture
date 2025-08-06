@@ -7,11 +7,14 @@ import { USER_SERVER_URL } from "@/utils/constant";
 import { UserProfile } from "@/utils/type";
 import ProfileSearch from "./ProfileSearch";
 import { Skeleton } from "../ui/skeleton";
+import useCurrentUser from "@/utils/Hooks/useCurrentUser";
+import { authHeaders } from "@/utils/utils";
 
 const SearchUser = () => {
   const [loading, setLoading] = React.useState(false);
   const [usernameInput, setUsernameInput] = React.useState("");
   const [profiles, setProfiles] = React.useState<UserProfile[]>([]);
+  const { userProfile } = useCurrentUser();
 
   const fetchUsersByUsername = async () => {
     setLoading(true);
@@ -19,25 +22,35 @@ const SearchUser = () => {
       const { data } = await axios.get(`${USER_SERVER_URL}/search_users`, {
         params: {
           username: usernameInput,
-          currentUser: "akashkrsinha5084"
+          currentUser: userProfile?.Username,
         },
       });
-      console.log("Fetched users: ", data.users);
-      // Handle null/undefined users array safely
       const users = data?.users || [];
       setProfiles(Array.isArray(users) ? users : []);
     } catch (error) {
       console.log("Error in fetching users: ", error);
-      // Reset profiles to empty array on error
       setProfiles([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const sendFriendRequest = (username: string) => {
-    console.log("Selected user:", username);
-    // Add logic here to handle user selection (e.g., start chat, view profile, etc.)
+  const sendFriendRequest = async (username: string) => {
+    try {
+      const { headers } = await authHeaders();
+      const { data } = await axios.put(
+        `${USER_SERVER_URL}/send_friend_request`,
+        { username },
+        { headers }
+      );
+      if (data?.success) {
+        console.log(`Friend request sent to ${username}`);
+      } else {
+        console.error(`Failed to send friend request to ${username}`);
+      }
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+    }
   };
 
   React.useEffect(() => {

@@ -25,4 +25,7 @@ func main() {
 	if err := database.DB.AutoMigrate(&models.Content{}); err != nil {
 		log.Printf("Error migrating Content: %v", err)
 	}
+	if err := database.DB.AutoMigrate(&models.FriendRequest{}); err != nil {
+		log.Printf("Error migrating FriendRequest: %v", err)
+	}
 }

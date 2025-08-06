@@ -4,6 +4,7 @@ import RootApp from "./components/RootApp";
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import AppAuthProvider from "./utils/AppAuthProvider";
+import FriendRequests from "./pages/FriendRequests";
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
             <Route index element={<Navigate to="/auth" replace />} />
 
             <Route path="/home" element={<Home />} />
-            <Route path="/email" element={<>aklj</>} />
+            <Route path="/friend_requests" element={<FriendRequests />} />
           </Route>
         </Routes>
       </div>

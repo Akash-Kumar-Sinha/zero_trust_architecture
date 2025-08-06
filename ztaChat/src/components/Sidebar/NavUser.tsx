@@ -2,9 +2,9 @@ import {
   BadgeCheck,
   Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
   Sparkles,
+  UserPlus2,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import { type Profile } from "@/utils/type";
 import useCurrentUser from "@/utils/Hooks/useCurrentUser";
+import { NavLink } from "react-router";
 
 export const NavUser = ({ user }: { user: Profile }) => {
   const { isMobile } = useSidebar();
@@ -82,8 +83,10 @@ export const NavUser = ({ user }: { user: Profile }) => {
                 Account
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <CreditCard />
-                Billing
+                <NavLink to="/friend_requests" className="flex items-center gap-2">
+                  <UserPlus2 />
+                  FriendRequests
+                </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Bell />

@@ -13,16 +13,20 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { data } from "./sidebar";
+import { getSidebarData } from "./sidebar";
 import SearchUser from "./SearchUser";
 import { NavUser } from "./NavUser";
 import useCurrentUser from "@/utils/Hooks/useCurrentUser";
 import { Skeleton } from "../ui/skeleton";
+import useFriends from "@/utils/Hooks/useFriends";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
   const { userProfile } = useCurrentUser();
+  const {friends} = useFriends();
 
+  const data = getSidebarData(friends);
+  
   return (
     <Sidebar {...props}>
       <SidebarHeader>

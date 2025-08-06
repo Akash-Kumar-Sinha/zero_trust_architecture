@@ -1,3 +1,5 @@
+import { Profile } from "@/utils/type";
+
 export interface SidebarItem {
   title: string;
   url: string;
@@ -15,22 +17,18 @@ export interface SidebarData {
   navMain: SidebarNavMain[];
 }
 
-export const chats = [
-  { id: "chat1", name: "Alice" },
-  { id: "chat2", name: "Bob" },
-  { id: "chat3", name: "Charlie" },
-];
-
-export const data: SidebarData = {
-  versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
-  navMain: [
-    {
-      title: "Chats",
-      url: "#",
-      items: chats.map(chat => ({
-        title: chat.name,
-        url: `/chat/${chat.id}`, 
-      })),
-    },
-  ],
+export const getSidebarData = (friends: Profile[]): SidebarData => {
+  return {
+    versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
+    navMain: [
+      {
+        title: "Chats",
+        url: "#",
+        items: friends.map((friend) => ({
+          title: friend.Username,
+          url: `/chat/${friend.ID}`,
+        })),
+      },
+    ],
+  };
 };

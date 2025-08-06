@@ -1,9 +1,7 @@
 import { UserProfile } from "@/utils/type";
-import {
-  Card,
-  CardContent,
-  } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserPlus } from "lucide-react";
 
 interface ProfileSearchProps {
   profile: UserProfile;
@@ -25,14 +23,17 @@ const ProfileSearch = ({ profile, sendFriendRequest }: ProfileSearchProps) => {
       }
       title="Click to send friend request"
     >
-      <CardContent className="flex gap-2 items-center justify-center">
-        <Avatar>
-          <AvatarImage src={profile.ProfileImage} />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-        <span className="text-sm text-foreground">
-          {profile.Username}
-        </span>
+      <CardContent className="flex gap-2 items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Avatar>
+            <AvatarImage src={profile.ProfileImage} />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+          <span className="text-sm text-foreground">
+            {profile.Username.slice(0, 16)}
+          </span>
+        </div>
+        <UserPlus className="text-primary" />
       </CardContent>
     </Card>
   );

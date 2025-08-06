@@ -22,6 +22,4 @@ type Profile struct {
 	AboutMe      string     `gorm:"default:null"`
 	Status       UserStatus `gorm:"default:offline"`
 	LastSeen     time.Time  `gorm:"default:null"`
-
-	Conversations []Conversations `gorm:"foreignKey:ProfileID"`
 }

@@ -14,3 +14,13 @@ type JwtClaims struct {
 	UserID uint   `json:"user_id"`
 	jwt.RegisteredClaims
 }
+
+type VerifyResp struct {
+	Response
+	User JwtClaims `json:"user"`
+}
+
+type CurrentUserProfile struct {
+	Username string `form:"username" binding:"omitempty"`
+	ID       uint   `form:"id" binding:"omitempty"`
+}

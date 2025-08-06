@@ -27,22 +27,31 @@ const (
 
 type Conversations struct {
 	gorm.Model
-	Messages  []Messages `gorm:"foreignKey:ConversationID"`
-	ProfileID uint       `gorm:"not null"`
-	Profile   Profile    `gorm:"foreignKey:ProfileID"`
+
+	PrivateKey *string `gorm:"uniqueIndex:idx_keys_nullable"`
+	PublicKey  *string `gorm:"uniqueIndex:idx_keys_nullable"`
+
+	Profile1ID uint    `gorm:"not null;index:idx_unique_conversation,unique"`
+	Profile1   Profile `gorm:"foreignKey:Profile1ID"`
+
+	Profile2ID uint    `gorm:"not null;index:idx_unique_conversation,unique"`
+	Profile2   Profile `gorm:"foreignKey:Profile2ID"`
+
+	Messages []Messages `gorm:"foreignKey:ConversationID"`
 }
 
 type Messages struct {
 	gorm.Model
 	ConversationID uint          `gorm:"not null"`
 	Conversation   Conversations `gorm:"foreignKey:ConversationID"`
-	SenderID       uint          `gorm:"not null"`
-	Sender         Profile       `gorm:"foreignKey:SenderID"`
-	ReceiverID     uint          `gorm:"not null"`
-	Receiver       Profile       `gorm:"foreignKey:ReceiverID"`
-	Content        []Content     `gorm:"foreignKey:MessageID"`
-	Timestamp      time.Time     `gorm:"default:current_timestamp"`
-	IsRead         bool          `gorm:"default:false"`
+
+	SenderID uint    `gorm:"not null"`
+	Sender   Profile `gorm:"foreignKey:SenderID"`
+
+	Content []Content `gorm:"foreignKey:MessageID"`
+
+	Timestamp time.Time `gorm:"default:current_timestamp"`
+	IsRead    bool      `gorm:"default:false"`
 }
 
 type Content struct {

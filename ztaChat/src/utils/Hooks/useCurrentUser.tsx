@@ -4,6 +4,7 @@ import axios from "axios";
 import { USER_SERVER_URL } from "../constant";
 import { load } from "@tauri-apps/plugin-store";
 import { useNavigate } from "react-router";
+import { authHeaders } from "../utils";
 
 const useCurrentUser = () => {
   const [userProfile, setUserProfile] = useState<Profile>();
@@ -20,16 +21,12 @@ const useCurrentUser = () => {
   };
 
   const fetchUserProfile = async () => {
-    const store = await load("store.json");
-
-    const token = await store.get("zta_auth_token");
+    const { headers } = await authHeaders();
     try {
-      const { data } = await axios.get(`${USER_SERVER_URL}/current_user`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const { data } = await axios.get(
+        `${USER_SERVER_URL}/current_user`,
+        { headers }
+      );
       console.log("data: ", data);
       setUserProfile(data.profile);
     } catch (error) {

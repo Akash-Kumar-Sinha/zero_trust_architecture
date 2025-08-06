@@ -17,5 +17,7 @@ func AuthRoutes(router *gin.RouterGroup) *gin.RouterGroup {
 
 	router.GET("/verify_token_claims", handlers.VerifyTokenClaims)
 
+	router.GET("/get_keypair", handlers.GetKeyPair)
+
 	return router
 }
