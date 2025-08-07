@@ -1,0 +1,6 @@
+.env
+*.log
+chat_service
+dist/
+.DS_Store
+tmp/
