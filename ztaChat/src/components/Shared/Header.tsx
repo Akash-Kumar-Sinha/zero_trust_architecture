@@ -34,6 +34,13 @@ const Header = ({ url, navTitle, title }: HeaderProps) => {
             <BreadcrumbItem>
               <BreadcrumbPage>{title}</BreadcrumbPage>
             </BreadcrumbItem>
+            <Separator
+              orientation="vertical"
+              className="mr-2 data-[orientation=vertical]:h-4"
+            />
+            <BreadcrumbItem >
+              Encrypt
+            </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
