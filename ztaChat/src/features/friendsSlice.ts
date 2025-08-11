@@ -18,10 +18,8 @@ const initialState: Friends = {
 export const getFriends = createAsyncThunk(
   "friends/getFriends",
   async (userId: number) => {
-    console.log("🚀 Getting friends for user ID:", userId);
 
     const token = localStorage.getItem("token");
-    console.log("🔑 Auth token exists:", !!token);
 
     const { data } = await axios.get(`${USER_SERVER_URL}/get_friends`, {
       params: {
@@ -31,7 +29,6 @@ export const getFriends = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("👥 Friends API response:", data);
     return data;
   }
 );

@@ -72,10 +72,14 @@ func GetConversation(c *gin.Context) {
 
 	var conversation models.Conversations
 
+	// Use preloading to get complete conversation with profiles
 	if err := tx.
 		Preload("Profile1").
 		Preload("Profile2").
-		Where("profile1_id = ? AND profile2_id = ?", userOne.ID, userTwo.ID).Or("profile1_id = ? AND profile2_id = ?", userTwo.ID, userOne.ID).Find(&conversation).Error; err != nil {
+		Preload("Members").
+		Preload("Members.User").
+		Where("(profile1_id = ? AND profile2_id = ?) OR (profile1_id = ? AND profile2_id = ?)",
+			userOne.ID, userTwo.ID, userTwo.ID, userOne.ID).First(&conversation).Error; err != nil {
 		tx.Rollback()
 		c.JSON(404, utils.Response{
 			Code:    404,
@@ -85,7 +89,9 @@ func GetConversation(c *gin.Context) {
 		})
 		return
 	}
+
 	tx.Commit()
+
 	c.JSON(200, getConversationsResponse{
 		Response: utils.Response{
 			Code:    200,

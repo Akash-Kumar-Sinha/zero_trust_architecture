@@ -30,6 +30,7 @@ export const getConversations = createAsyncThunk(
         user_two_username: userTwoUsername,
       },
     });
+    console.log("Fetched conversation data:", data);
     return data;
   }
 );

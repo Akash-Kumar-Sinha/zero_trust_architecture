@@ -30,7 +30,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   React.useEffect(() => {
     if (userProfile?.ID) {
-      console.log("🔄 Loading friends for user:", userProfile.Username);
       dispatch(getFriends(userProfile.ID));
     } else {
       dispatch(fetchUserProfile());

@@ -74,6 +74,8 @@ func AcceptFriendRequest(c *gin.Context) {
 		Profile2ID: friendRequest.ReceiverID,
 	}
 
+	conversations.NormalizeProfiles()
+
 	if err := tx.Create(&conversations).Error; err != nil {
 		tx.Rollback()
 		c.JSON(500, utils.Response{

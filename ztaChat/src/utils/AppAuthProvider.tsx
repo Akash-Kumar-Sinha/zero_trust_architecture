@@ -16,14 +16,10 @@ const AppAuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const checkAuthentication = async () => {
     try {
-      console.log("Checking app-level authentication...");
 
-      // Load stored data into Redux if not already loaded
       const storeState = await dispatch(loadStoredData()).unwrap();
       const email = storeState.userEmail;
       const token = storeState.authToken;
-
-      console.log("Email:", email, "Token exists:", !!token);
 
       if (!email || !token || email === "" || token === "") {
         console.log("No credentials found");
@@ -31,7 +27,6 @@ const AppAuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
-      console.log("Found credentials, verifying with server...");
       const { data } = await axios.get(
         `${AUTH_SERVER_URL}/auth_verifications`,
         {
@@ -44,15 +39,11 @@ const AppAuthProvider = ({ children }: { children: React.ReactNode }) => {
       );
 
       if (data.success) {
-        console.log("User is authenticated");
         setAuthStatus("AUTHENTICATED");
 
-        // Fetch user profile once authenticated
-        console.log("🔄 Dispatching fetchUserProfile...");
         dispatch(fetchUserProfile());
 
         if (location.pathname === "/auth") {
-          console.log("Authenticated user on auth page, redirecting to /home");
           navigate("/home", { replace: true });
         }
       } else {

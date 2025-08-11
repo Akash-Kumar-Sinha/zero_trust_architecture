@@ -22,9 +22,14 @@ func main() {
 	if err := database.DB.AutoMigrate(&models.Messages{}); err != nil {
 		log.Printf("Error migrating Messages: %v", err)
 	}
-	if err := database.DB.AutoMigrate(&models.Content{}); err != nil {
-		log.Printf("Error migrating Content: %v", err)
+	if err := database.DB.AutoMigrate(&models.MessageContent{}); err != nil {
+		log.Printf("Error migrating MessageContent: %v", err)
 	}
+
+	if err := database.DB.AutoMigrate(&models.ConversationMember{}); err != nil {
+		log.Printf("Error migrating ConversationMember: %v", err)
+	}
+	
 	if err := database.DB.AutoMigrate(&models.FriendRequest{}); err != nil {
 		log.Printf("Error migrating FriendRequest: %v", err)
 	}

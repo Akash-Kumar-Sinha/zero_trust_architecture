@@ -3,6 +3,7 @@ package main
 import (
 	"chat_service/internal/database"
 	"chat_service/internal/ws"
+	"flag"
 	"log"
 	"os"
 
@@ -26,9 +27,12 @@ func main() {
 	}
 
 	r := gin.Default()
+	flag.Parse()
+	hub := ws.NewHub()
+	go hub.Hubrun()
 
 	r.GET("/ws", func(c *gin.Context) {
-		ws.Wshandler(c.Writer, c.Request)
+		ws.Wshandler(hub, c.Writer, c.Request)
 	})
 
 	log.Printf("Server starting on port %s", port)
