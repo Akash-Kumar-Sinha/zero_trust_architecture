@@ -57,7 +57,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
       return new Promise((resolve, reject) => {
         try {
-          // Check if already connected to the same conversation
           if (
             socketRef.current &&
             socketRef.current.readyState === WebSocket.OPEN &&
@@ -68,13 +67,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
             return;
           }
 
-          // Prevent multiple connection attempts
           if (isConnectingRef.current) {
             console.log("⏳ Connection already in progress");
             return;
           }
 
-          // Close existing connection if any
           if (socketRef.current) {
             socketRef.current.close();
           }
@@ -161,7 +158,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     return false;
   }, []);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (socketRef.current) {

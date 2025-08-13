@@ -102,7 +102,6 @@ const Auth = () => {
 
       console.log("OTP Verification returned token:", data);
 
-      // Save OTP token using Redux
       await dispatch(saveOtpToken(data.token)).unwrap();
 
       if (data.success) {
@@ -131,7 +130,6 @@ const Auth = () => {
       const validatedData = passwordSchema.parse({ password });
       console.log("Valid password:", validatedData.password);
 
-      // Get OTP token from Redux store
       const otpToken = tokens.otpToken;
 
       if (!otpToken) {
@@ -157,7 +155,6 @@ const Auth = () => {
       );
 
       if (data.success) {
-        // Save auth credentials using Redux
         await dispatch(
           saveAuthCredentials({
             authToken: data.token,
@@ -183,7 +180,6 @@ const Auth = () => {
         }));
       }
     } finally {
-      // Clear loading state in all cases
       setLoading(false);
     }
   };
@@ -262,7 +258,6 @@ const Auth = () => {
         initial="hidden"
         animate="visible"
       >
-        {/* Welcome Section */}
         <motion.div className="text-center space-y-4" variants={itemVariants}>
           <motion.div
             className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent"
@@ -282,7 +277,6 @@ const Auth = () => {
           </motion.div>
         </motion.div>
 
-        {/* Auth Card */}
         <motion.div variants={itemVariants}>
           <Card className="backdrop-blur-xl bg-card/80 border-border/20 shadow-2xl">
             <CardHeader className="space-y-4 text-center">

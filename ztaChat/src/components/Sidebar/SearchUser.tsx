@@ -1,4 +1,6 @@
 import * as React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search } from "lucide-react";
 
 import { SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Input } from "../ui/input";
@@ -59,7 +61,7 @@ const SearchUser = () => {
       const debounceTimer = setTimeout(() => {
         setLoading(true);
         fetchUsersByUsername();
-      }, 300); 
+      }, 300);
 
       return () => clearTimeout(debounceTimer);
     } else {
@@ -70,44 +72,88 @@ const SearchUser = () => {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <div className="space-y-2">
-          <Input
-            placeholder="Search by username"
-            value={usernameInput}
-            onChange={(e) => setUsernameInput(e.target.value)}
-            disabled={loading}
-          />
+        <motion.div
+          className="space-y-2"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-sidebar-foreground/50" />
+            <Input
+              placeholder="Search users..."
+              value={usernameInput}
+              onChange={(e) => setUsernameInput(e.target.value)}
+              disabled={loading}
+              className="pl-10 h-9 bg-sidebar-accent/30 border-sidebar-border/50 focus:border-sidebar-primary/60 focus:ring-sidebar-primary/20 placeholder:text-sidebar-foreground/50 text-sidebar-foreground rounded-lg transition-all duration-300 hover:bg-sidebar-accent/40"
+            />
+            {loading && (
+              <motion.div
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              >
+                <div className="w-4 h-4 border-2 border-sidebar-primary/30 border-t-sidebar-primary rounded-full" />
+              </motion.div>
+            )}
+          </div>
 
-          {loading && usernameInput && (
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-8 w-full" />
-            </div>
-          )}
-
-          {!loading &&
-            usernameInput &&
-            Array.isArray(profiles) &&
-            profiles.length > 0 && (
-              <div className="space-y-2">
-                {profiles.map((profile) => (
-                  <ProfileSearch
-                    key={profile.ID?.toString() || profile.Username}
-                    profile={profile}
-                    sendFriendRequest={sendFriendRequest}
-                  />
-                ))}
-              </div>
+          <AnimatePresence mode="wait">
+            {loading && usernameInput && (
+              <motion.div
+                className="px-1"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Skeleton className="h-12 w-full bg-sidebar-accent/30 rounded-lg" />
+              </motion.div>
             )}
 
-          {!loading &&
-            usernameInput &&
-            (!profiles ||
-              (Array.isArray(profiles) && profiles.length === 0)) && (
-              <div className="text-sm text-muted-foreground p-2">
-                No users found for "{usernameInput}"
-              </div>
-            )}
-        </div>
+            {!loading &&
+              usernameInput &&
+              Array.isArray(profiles) &&
+              profiles.length > 0 && (
+                <motion.div
+                  className="space-y-1 max-h-96 overflow-y-auto px-1"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {profiles.map((profile, index) => (
+                    <motion.div
+                      key={profile.ID?.toString() || profile.Username}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05, duration: 0.2 }}
+                    >
+                      <ProfileSearch
+                        profile={profile}
+                        sendFriendRequest={sendFriendRequest}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+
+            {!loading &&
+              usernameInput &&
+              (!profiles ||
+                (Array.isArray(profiles) && profiles.length === 0)) && (
+                <motion.div
+                  className="text-xs text-sidebar-foreground/60 p-2 text-center bg-sidebar-accent/20 rounded-lg border border-sidebar-border/30"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  No users found for "{usernameInput}"
+                </motion.div>
+              )}
+          </AnimatePresence>
+        </motion.div>
       </SidebarMenuItem>
     </SidebarMenu>
   );

@@ -30,8 +30,6 @@ export const connectSocket = createAsyncThunk(
         throw new Error("Missing conversation or profile ID");
       }
 
-      // The actual WebSocket connection is handled by the WebSocketContext
-      // This thunk is mainly for state management
       return {
         conversationId,
         profileId,
@@ -83,7 +81,6 @@ export const socketSlice = createSlice({
         state.error = null;
       })
       .addCase(connectSocket.fulfilled, (state, action) => {
-        // Store connection info when successfully connected
         state.connectionInfo = action.payload;
         state.error = null;
       })
